@@ -7,12 +7,12 @@ import java.io.*;
 import java.net.URISyntaxException;
 
 public class FileReadingUtility {
-    private static final String DEFAULT_FILE_PATH = "resources/centresLocaux.txt";
+    public static final String DEFAULT_FILE_PATH = "/centresLocaux.txt";
 
-    public  Graph readTextFile() {
+    public Graph createGraph(String fileName) {
         Graph graph = new Graph();
 
-        InputStream inputStream = Main.class.getResourceAsStream("/centresLocaux.txt");
+        InputStream inputStream = Main.class.getResourceAsStream(fileName);
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));

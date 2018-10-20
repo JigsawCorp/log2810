@@ -1,6 +1,7 @@
 package main.java.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Graph {
 	
@@ -39,7 +40,19 @@ public class Graph {
 		
 		return time;
 	}*/
-	public String toString() {
+	/*public String toString() {
 		return clscArray_.toString() + "\n\n" + pathArray_.toString();
+	}
+	*/
+
+	public List<Clsc> getCLSCs() {
+	    return clscArray_;
+    }
+
+	public String toString() {
+		for (int i = 0; i < clscArray_.size(); ++i) {
+			System.out.print("CLSC_" + i + ", ");
+		}
+		return null;
 	}
 }
