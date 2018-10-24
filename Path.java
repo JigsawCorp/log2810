@@ -1,20 +1,18 @@
 
 public class Path {
 	
-	Clsc first_;
-	Clsc second_;
+	Clsc destination_;
 	int time_;
 	
-	public Path(Clsc first, Clsc second, int time) {
-		first_ = first;
-		second_ = second;
+	public Path(Clsc destination, int time) {
+		destination_ = destination;
 		time_ = time;
 	}
 	
-	public Clsc getDestination_() {
+	public Clsc getDestination() {
 		return destination_;
 	}
-	public int getTime_() {
+	public int getTime() {
 		return time_;
 	}
 	
