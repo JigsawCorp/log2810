@@ -16,6 +16,13 @@ public class Path {
 		return fTime;
 	}
 
-	
+	public void setTime(int time) {
+		fTime = time;
+	}
+
+	public Clsc getPreviousNode() {
+		return fPreviousNode;
+	}
+
 
 }

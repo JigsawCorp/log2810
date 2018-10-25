@@ -16,7 +16,7 @@ public class Application {
         Graph graph = new FileReadingUtility().createGraph(FileReadingUtility.DEFAULT_FILE_PATH);
         System.out.println(graph.toString());
         //Dijkstra.getShortestPath(graph.getCLSCs().get(1), Patient.Type.HIGH_RISK, graph, graph.getCLSCs().get(3));
-        Dijkstra.getShortestPath(graph.getCLSCs().get(0), Patient.Type.HIGH_RISK, graph, graph.getCLSCs().get(7));
+        Dijkstra.getShortestPath(graph.getCLSCs().get(1), Patient.Type.HIGH_RISK, graph, graph.getCLSCs().get(22));
         presentChoices();
     }
 

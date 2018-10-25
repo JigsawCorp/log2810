@@ -7,8 +7,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 
 public class FileReadingUtility {
-    //public static final String DEFAULT_FILE_PATH = "/centresLocaux.txt";
-    public static final String DEFAULT_FILE_PATH = "/test.txt";
+    public static final String DEFAULT_FILE_PATH = "/centresLocaux.txt";
+    //public static final String DEFAULT_FILE_PATH = "/test.txt";
 
     public Graph createGraph(String fileName) {
         Graph graph = new Graph();
