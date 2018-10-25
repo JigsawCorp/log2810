@@ -6,22 +6,19 @@ import java.util.List;
 public class Graph {
 	
 	private ArrayList<Clsc> clscArray_;
-	private ArrayList<Path> pathArray_;
 	
 	public Graph() {
 		clscArray_ = new ArrayList<Clsc>();
-		pathArray_ = new ArrayList<Path>();
-	}
-	
-	public void addPath (int first,int second, int time) {
-		pathArray_.add(new Path(clscArray_.get(first - 1), clscArray_.get(second - 1), time));
-		pathArray_.add(new Path(clscArray_.get(second - 1), clscArray_.get(first - 1), time));
 	}
 	
 	public void addClsc(int id, boolean hasTerminal) {
 		clscArray_.add(new Clsc(id, hasTerminal));
 	}
 
+	public void addClscPath(int first, int second, int distance) {
+		clscArray_.get(first - 1).getNeigbourghs().put(clscArray_.get(second - 1), distance);
+		clscArray_.get(second - 1).getNeigbourghs().put(clscArray_.get(first - 1), distance);
+	}
 	/**
 	 * 
 	 * @param start -Summit we're starting from

@@ -1,17 +1,22 @@
 package main.java.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Clsc {
 	
 	int id_;
 	boolean hasTerminal_;
-	ArrayList<Path> paths_;
+	//ArrayList<Path> fPaths;
+	//ArrayList<Clsc> fNeigbourghs;
+
+	HashMap<Clsc, Integer> fNeigbourghs;
 	
 	public Clsc(int id, boolean hasTerminal) {
 		id_ = id;
 		hasTerminal_ = hasTerminal;
-		paths_ = new ArrayList<Path>();
+		fNeigbourghs = new HashMap<>();
+
 	}
 	
 	public int getId() {
@@ -22,8 +27,20 @@ public class Clsc {
 		return hasTerminal_;
 	}
 	
-	void addPath(Path path) {
-		paths_.add(path);
+	//void addPath(Path path) {
+	//	fPaths.add(path);
+	//}
+
+	//public ArrayList<Clsc> getNeigbourghs() {
+	//	return fNeigbourghs;
+	//}
+
+	//public ArrayList<Path> getPaths() {
+	//	return fPaths;
+	//}
+
+	public HashMap<Clsc, Integer> getNeigbourghs() {
+		return fNeigbourghs;
 	}
 	
 	public String toString() {

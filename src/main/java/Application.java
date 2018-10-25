@@ -1,6 +1,7 @@
 package main.java;
 
 import main.java.model.Graph;
+import main.java.model.Patient;
 import main.java.utility.Dijkstra;
 import main.java.utility.FileReadingUtility;
 
@@ -14,6 +15,8 @@ public class Application {
     public void start() {
         Graph graph = new FileReadingUtility().createGraph(FileReadingUtility.DEFAULT_FILE_PATH);
         System.out.println(graph.toString());
+        //Dijkstra.getShortestPath(graph.getCLSCs().get(1), Patient.Type.HIGH_RISK, graph, graph.getCLSCs().get(3));
+        Dijkstra.getShortestPath(graph.getCLSCs().get(0), Patient.Type.HIGH_RISK, graph, graph.getCLSCs().get(7));
         presentChoices();
     }
 
@@ -35,6 +38,7 @@ public class Application {
                     endChoice = br.readLine();
                     System.out.println("Quel type de patient voulez-vous transporter?");
                     patientChoice = br.readLine();
+                   // Dijkstra.getShortestPath(Integer.parseInt(startChoice), Patient.Type.HIGH_RISK, );
                     //Dijkstra.getShortestPath(Integer.parseInt(startChoice), Integer.parseInt(endChoice), );
                     break;
                 case "c":

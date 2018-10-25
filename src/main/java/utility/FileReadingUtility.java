@@ -7,7 +7,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 
 public class FileReadingUtility {
-    public static final String DEFAULT_FILE_PATH = "/centresLocaux.txt";
+    //public static final String DEFAULT_FILE_PATH = "/centresLocaux.txt";
+    public static final String DEFAULT_FILE_PATH = "/test.txt";
 
     public Graph createGraph(String fileName) {
         Graph graph = new Graph();
@@ -29,7 +30,8 @@ public class FileReadingUtility {
             // Read the second series of numbers that represents a specific path and its crossing time.
             while((currentLine = br.readLine()) != null) {
                 String[] splitString = currentLine.split(",");
-                graph.addPath(Integer.parseInt(splitString[0]), Integer.parseInt(splitString[1]), Integer.parseInt(splitString[2]));
+              //  graph.addPath(Integer.parseInt(splitString[0]), Integer.parseInt(splitString[1]), Integer.parseInt(splitString[2]));
+                graph.addClscPath(Integer.parseInt(splitString[0]), Integer.parseInt(splitString[1]), Integer.parseInt(splitString[2]));
             }
 
 
