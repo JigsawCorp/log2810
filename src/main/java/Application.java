@@ -38,8 +38,6 @@ public class Application {
                     endChoice = br.readLine();
                     System.out.println("Quel type de patient voulez-vous transporter?");
                     patientChoice = br.readLine();
-                   // Dijkstra.getShortestPath(Integer.parseInt(startChoice), Patient.Type.HIGH_RISK, );
-                    //Dijkstra.getShortestPath(Integer.parseInt(startChoice), Integer.parseInt(endChoice), );
                     break;
                 case "c":
                     System.out.println("Choice is : c");

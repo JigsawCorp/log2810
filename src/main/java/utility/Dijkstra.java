@@ -12,29 +12,7 @@ public class Dijkstra {
     public static Integer getDistance(Clsc startNode, Clsc endNode) {
         return startNode.getNeigbourghs().get(endNode);
     }
-    /*
-    public static Clsc getSmallestDistanceNode(Clsc startingNode, Set<Clsc> examinedNodes) {
-        Map.Entry<Clsc, Integer> minimum = null;
-        for (Map.Entry<Clsc, Integer> entry : startingNode.getNeigbourghs().entrySet()) {
-            if (minimum == null) {
-                if (!examinedNodes.contains(entry.getKey())) {
-                    minimum = entry;
-                }
-            }
-            else {
-                if (entry.getValue() < minimum.getValue() && !examinedNodes.contains(entry.getKey())) {
-                    minimum = entry;
-                }
-            }
-        }
 
-        if (minimum == null) {
-            return null;
-        }
-
-        return minimum.getKey();
-    }
-    */
 
     public static Clsc getSmallestDistanceNode(Clsc startingNode, Set<Clsc> examinedNodes, HashMap<Clsc, Path> paths) {
         Map.Entry<Clsc, Path> minimum = null;
@@ -60,12 +38,6 @@ public class Dijkstra {
 
 
     public static void updateNeibourghs(Clsc node, HashMap<Clsc, Path> pathLengths, Set<Clsc> examinedNodes) {
-        if (node == null) {
-            System.out.println("null clsc");
-        }
-        else if (node.getNeigbourghs() == null) {
-            System.out.println("neigbour null");
-        }
         for (Map.Entry<Clsc, Integer> entry : node.getNeigbourghs().entrySet()) {
             if (!examinedNodes.contains(entry.getKey()) && (pathLengths.get(node).getTime() + node.getNeigbourghs().get(entry.getKey())) < pathLengths.get(entry.getKey()).getTime()) {
                 //pathLengths.replace(entry.getKey(), node.getNeigbourghs().get(entry.getKey()) + pathLengths.get(node).getTime());
@@ -80,7 +52,8 @@ public class Dijkstra {
         Set<Clsc> toHandleNodes = new HashSet<>();
         for (int i = 0; i < graph.getCLSCs().size(); ++i) {
             toHandleNodes.add(graph.getCLSCs().get(i));
-            if (startPoint == graph.getCLSCs().get(i)) {
+            if (startPoint == graph.getCLSCs().get(i))
+            {
                 clscPathLenghts.put(graph.getCLSCs().get(i), new Path(graph.getCLSCs().get(i), 0));
             }
             else {
@@ -102,23 +75,5 @@ public class Dijkstra {
 
         System.out.println("The Shortest path from the CLSC" + startPoint.getId() + " to the CLSC" + endPoint.getId() + " is " + clscPathLenghts.get(endPoint).getTime());
 
-        /*
-        while (!examinedNodes.isEmpty()) {
-            Iterator<Clsc> iterator = toHandleNodes.iterator();
-            Clsc minimum = toHandleNodes.iterator().next();
-            while (iterator.hasNext()) {
-                Clsc currentClsc = iterator.next();
-                if (clscPathLenghts.get(currentClsc) < clscPathLenghts.get(minimum)) {
-                    minimum = currentClsc;
-                }
-            }
-            examinedNodes.add(minimum);
-            iterator = toHandleNodes.iterator();
-            while (iterator.hasNext()) {
-                Clsc currentClsc = iterator.next();
-                if (clscPathLenghts.get(minimum) + 1 < clscPathLenghts.get(currentClsc))
-            }
-        }
-        */
     }
 }
