@@ -21,6 +21,7 @@ public class main {
 		
 		for (;;) {
 			String selectedOption = JOptionPane.showInputDialog(MENU);
+			selectedOption = selectedOption.toLowerCase();
 			switch (selectedOption) {
 			case "a" : 
 				updateGraph(graph);
@@ -41,6 +42,7 @@ public class main {
 			
 		}
 	}
+	
 	/**
 	 * 
 	 * @param graph: graph to modify
@@ -164,6 +166,7 @@ public class main {
 	private static  Graph readTextFile(String nomFichier) {
 		
 		ArrayList<Clsc> clscArray = new ArrayList<Clsc>();
+		ArrayList<Clsc> clscBorne = new ArrayList<Clsc>();
 		BufferedReader br = null;
 		FileReader fr = null;
 		
@@ -176,7 +179,10 @@ public class main {
 			// Read first series of numbers that represents the Clsc's id and the presence of an electrical terminal or not.
 			while (!((currentLine = br.readLine()).equals(""))) {
 				String[] splitLine = currentLine.split(",");
-				clscArray.add(new Clsc(Integer.parseInt(splitLine[0]), splitLine[1] != "0"));
+				Clsc clsc = new Clsc(Integer.parseInt(splitLine[0]), splitLine[1] != "0");
+				clscArray.add(clsc);
+				if(splitLine[1] == "0") 
+					clscBorne.add(clsc);
 			}
 			// Read the second series of numbers that represents a specific path and its crossing time.
 			while((currentLine = br.readLine()) != null) {
@@ -189,7 +195,7 @@ public class main {
 			// Pour s'assurer que le fichier n'est pas vide.
 			e.printStackTrace();
 		}
-		Graph graph = new Graph(clscArray);
+		Graph graph = new Graph(clscArray,clscBorne);
 		return graph;
 	}
 }
