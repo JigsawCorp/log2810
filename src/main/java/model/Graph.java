@@ -5,19 +5,25 @@ import java.util.List;
 
 public class Graph {
 	
-	private ArrayList<Clsc> clscArray_;
+	private ArrayList<Clsc> fClscArray;
+	private ArrayList<Clsc> fClscWithTerminals;
 	
 	public Graph() {
-		clscArray_ = new ArrayList<Clsc>();
+		fClscArray = new ArrayList<Clsc>();
+		fClscWithTerminals = new ArrayList<>();
 	}
 	
 	public void addClsc(int id, boolean hasTerminal) {
-		clscArray_.add(new Clsc(id, hasTerminal));
+		Clsc newClsc = new Clsc(id, hasTerminal);
+		fClscArray.add(newClsc);
+		if (hasTerminal) {
+			fClscWithTerminals.add(newClsc);
+		}
 	}
 
 	public void addClscPath(int first, int second, int distance) {
-		clscArray_.get(first - 1).getNeigbourghs().put(clscArray_.get(second - 1), distance);
-		clscArray_.get(second - 1).getNeigbourghs().put(clscArray_.get(first - 1), distance);
+		fClscArray.get(first - 1).getNeigbourghs().put(fClscArray.get(second - 1), distance);
+		fClscArray.get(second - 1).getNeigbourghs().put(fClscArray.get(first - 1), distance);
 	}
 	/**
 	 * 
@@ -38,16 +44,19 @@ public class Graph {
 		return time;
 	}*/
 	/*public String toString() {
-		return clscArray_.toString() + "\n\n" + pathArray_.toString();
+		return fClscArray.toString() + "\n\n" + pathArray_.toString();
 	}
 	*/
 
 	public List<Clsc> getCLSCs() {
-	    return clscArray_;
+	    return fClscArray;
     }
 
+    public List<Clsc> getClscWithTerminal() {
+		return fClscWithTerminals;
+	}
 	public String toString() {
-		for (int i = 0; i < clscArray_.size(); ++i) {
+		for (int i = 0; i < fClscArray.size(); ++i) {
 			System.out.print("CLSC_" + i + ", ");
 		}
 		return null;

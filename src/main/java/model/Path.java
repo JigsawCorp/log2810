@@ -20,8 +20,16 @@ public class Path {
 		fTime = time;
 	}
 
+	public void setPreviousNode(Clsc previousNode) {
+		fPreviousNode = previousNode;
+	}
+
 	public Clsc getPreviousNode() {
 		return fPreviousNode;
+	}
+
+	public static Integer getDistanceBetweenTwoNodes(Clsc startNode, Clsc endNode) {
+		return startNode.getNeigbourghs().get(endNode);
 	}
 
 

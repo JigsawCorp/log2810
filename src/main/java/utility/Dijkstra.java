@@ -1,13 +1,50 @@
 package main.java.utility;
 
-import main.java.model.Clsc;
-import main.java.model.Graph;
-import main.java.model.Path;
-import main.java.model.Patient;
+import main.java.model.*;
 
 import java.util.*;
 
 public class Dijkstra {
+
+    public static Vehicle getShortestPath(Clsc startingPoint, Clsc finishPoint, Graph graph, Patient.Type patientType) {
+        HashMap<Clsc, Path> shortestPathsFromStart = getAllShortestPaths(startingPoint, graph);
+        Vehicle vehicle = new Vehicle(Vehicle.BatteryType.NI_NH, patientType);
+        // Try to reach destination with the NI_NH battery
+       // if (vehicle.tryToReachDestination(getShortestPathBetweenTwoNodes(startingPoint, finishPoint, shortestPathsFromStart))) {
+        if (vehicle.tryToReachDestination(startingPoint, finishPoint, graph)) {
+            return vehicle;
+        }
+
+        vehicle.setBatteryType(Vehicle.BatteryType.LI_ION);
+        // If that didn't work, try reaching the destination with the LI_ION battery
+        if (vehicle.tryToReachDestination(startingPoint, finishPoint, graph)) {
+            return vehicle;
+        }
+
+        // If that also didn't work, then there is no way to reach the destination an
+       return  null;
+
+    }
+
+    /**
+     * Takes in a HashMap<Clsc,Path> and returns a list of all CLCSs to go through in order to reach the destination.
+     * @param startNode The starting CLSC
+     * @param endNode The destination CLSC
+     * @param pathLengths The HashMap<Clsc,Path> that holds all shortest paths
+     * @return A List<Clsc> that holds in chronological order how to get from the starting CLSC to the destination CLSC, where
+     * the first element is the starting CLSC and the last element is the destination CLSC.
+     */
+    public static List<Clsc> getShortestPathBetweenTwoNodes(Clsc startNode, Clsc endNode, HashMap<Clsc, Path> pathLengths) {
+        Clsc currentNode = null;
+        List<Clsc> shortestPath = new ArrayList<>();
+        shortestPath.add(endNode);
+        while (currentNode != startNode) {
+            currentNode = pathLengths.get(endNode).getPreviousNode();
+            shortestPath.add(currentNode);
+        }
+        Collections.reverse(shortestPath);
+        return shortestPath;
+    }
 
     public static Integer getDistance(Clsc startNode, Clsc endNode) {
         return startNode.getNeigbourghs().get(endNode);
@@ -40,13 +77,20 @@ public class Dijkstra {
     public static void updateNeibourghs(Clsc node, HashMap<Clsc, Path> pathLengths, Set<Clsc> examinedNodes) {
         for (Map.Entry<Clsc, Integer> entry : node.getNeigbourghs().entrySet()) {
             if (!examinedNodes.contains(entry.getKey()) && (pathLengths.get(node).getTime() + node.getNeigbourghs().get(entry.getKey())) < pathLengths.get(entry.getKey()).getTime()) {
-                //pathLengths.replace(entry.getKey(), node.getNeigbourghs().get(entry.getKey()) + pathLengths.get(node).getTime());
                 pathLengths.get(entry.getKey()).setTime(node.getNeigbourghs().get(entry.getKey()) + pathLengths.get(node).getTime());
+                pathLengths.get(entry.getKey()).setPreviousNode(node);
             }
         }
     }
 
-    public static void getShortestPath(Clsc startPoint, Patient.Type patientType, Graph graph, Clsc endPoint) {
+    /**
+     * Calculates from a starting node and a graph all shortest paths to get to every nodes from the starting point.
+     * @param startPoint
+     * @param graph
+     * @return A HashMap where the key is a certain node and the value is a class that holds the previous node (How to get to the current node) and the cummulative distance to get
+     * to this node.
+     */
+    public static HashMap<Clsc, Path> getAllShortestPaths(Clsc startPoint, Graph graph) {
         HashMap<Clsc, Path> clscPathLenghts = new HashMap<>();
         Set<Clsc> examinedNodes = new HashSet<>();
         Set<Clsc> toHandleNodes = new HashSet<>();
@@ -57,7 +101,7 @@ public class Dijkstra {
                 clscPathLenghts.put(graph.getCLSCs().get(i), new Path(graph.getCLSCs().get(i), 0));
             }
             else {
-                clscPathLenghts.put(graph.getCLSCs().get(i), new Path(graph.getCLSCs().get(i), Integer.MAX_VALUE));
+                clscPathLenghts.put(graph.getCLSCs().get(i), new Path(null, Integer.MAX_VALUE));
             }
         }
 
@@ -73,7 +117,7 @@ public class Dijkstra {
 
         }
 
-        System.out.println("The Shortest path from the CLSC" + startPoint.getId() + " to the CLSC" + endPoint.getId() + " is " + clscPathLenghts.get(endPoint).getTime());
-
+        //System.out.println("The Shortest path from the CLSC" + startPoint.getId() + " to the CLSC" + endPoint.getId() + " is " + clscPathLenghts.get(endPoint).getTime());
+        return clscPathLenghts;
     }
 }
