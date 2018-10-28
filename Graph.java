@@ -1,12 +1,32 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.security.auth.x500.X500Principal;
 
+
+/**
+ * @author Samuel Saito-Gagné
+ * @coauthor nobody
+ *
+ */
 public class Graph {
 	
 	ArrayList<Clsc> clscArray_;
-	ArrayList<Path> pathArray_;
+	ArrayList<Clsc> chargingStations_;
+	
+	Graph(ArrayList<Clsc> clscArray, ArrayList<Clsc> chargingStations) {
+		clscArray_ = clscArray;
+		chargingStations_ = chargingStations;
+	}
 	 
+	public Clsc getClscById(int id) {
+		return clscArray_.get(id - 1);
+	}
+	
+	public ArrayList<Clsc> getArray() {
+		return clscArray_;
+	}
+	
 	/**
 	 * 
 	 * @param start -Summit we're starting from
@@ -22,7 +42,7 @@ public class Graph {
 		HashMap<Clsc, ClscNode> map = new HashMap<Clsc, ClscNode>();		
 		ArrayList<Clsc> visitedList = new ArrayList<Clsc>();
 		// We initialize our Hashmap and our ArrayList, and we also put start in the list
-		initialize(map, visitedList, start);
+		initialize(map, visitedList, start, vehicle);
 		
 		int bestTime = Dijkstra(map, visitedList, start, destination, vehicle);
 		
@@ -30,7 +50,7 @@ public class Graph {
 		if (bestTime != Integer.MAX_VALUE) {	// If no errors with the NI-NH vehicle
 			builder.append("Shortest path to CLSC #" + destination.getId() + " from CLSC #" + start.getId() + " :\n"
 					+ "\tVehicle type : NI-NH\n"
-					+ "\tBattery remaining : " + String.format("%.2f", vehicle.chargeLeft()) + "%"
+					+ "\tBattery remaining : " + String.format("%.2f", vehicle.chargeLeft()) + "%\n"
 					+ "\tShortest path :\n\t");
 			for (Clsc clsc : map.get(destination).getPathToPoint_()) {
 				builder.append(" -> " + clsc.getId());
@@ -41,14 +61,14 @@ public class Graph {
 		// If the NI-NH vehicle failed, we must try with the LI-ion vehicle
 		vehicle.switchType();
 		// We also reset our containers and try again
-		initialize(map, visitedList, start);
+		initialize(map, visitedList, start, vehicle);
 		bestTime = Dijkstra(map, visitedList, start, destination, vehicle);
 		
 		if (bestTime != Integer.MAX_VALUE) {	// If a path has been found with the LI-ion vehicle
 			// Same code as above... Only Vehicle type changes
 			builder.append("Shortest path to CLSC #" + destination.getId() + " from CLSC #" + start.getId() + " :\n"
 					+ "\tVehicle type : LI-ion\n"
-					+ "\tBattery remaining : " + String.format("%.2f", vehicle.chargeLeft()) + "%"
+					+ "\tBattery remaining : " + String.format("%.2f", vehicle.chargeLeft()) + "%\n"
 					+ "\tShortest path :\n\t");
 			for (Clsc clsc : map.get(destination).getPathToPoint_()) {
 				builder.append(" -> " + clsc.getId());
@@ -64,7 +84,7 @@ public class Graph {
 		return builder.toString();
 	}
 	
-	private void initialize(HashMap<Clsc, ClscNode> mapToInitialize, ArrayList<Clsc> listToInitialize, Clsc start) {
+	private void initialize(HashMap<Clsc, ClscNode> mapToInitialize, ArrayList<Clsc> listToInitialize, Clsc start, Vehicle vehicle) {
 		// The content is reset
 		mapToInitialize.clear();
 		listToInitialize.clear();
@@ -77,6 +97,9 @@ public class Graph {
 		mapToInitialize.get(start).setTime_(0);
 		mapToInitialize.get(start).addToPath(start);
 		listToInitialize.add(start);	// We first visit the starting CLSC
+		
+		// The battery is fully charged
+		vehicle.charge();
 	}
 	
 	/* 1- We find the shortest CLSC not in visited
@@ -85,6 +108,10 @@ public class Graph {
 	// TODO: update the algorithm with Vehicle
 	private int Dijkstra(HashMap<Clsc, ClscNode> map, ArrayList<Clsc> visitedList, Clsc start, Clsc destination, Vehicle vehicle) {
 				
+		// Case if our destination is at the same place of our start
+		if (start == destination)
+			return 0;
+		
 		int shortestTime = Integer.MAX_VALUE;
 		Clsc nextClsc = null;
 		
@@ -93,27 +120,95 @@ public class Graph {
 			// ...We check every path
 			for (Path path : visited.getPaths()) {
 				Clsc currentClsc = path.getDestination();
-				ClscNode currentNode = map.get(currentClsc);
+				ClscNode neighbor = map.get(currentClsc);
 				// We update all of visited's neighbors
-				currentNode.update(map.get(visited), path.getTime());
+				neighbor.update(map.get(visited), path.getTime());
 				// We find the shortest point to a neighbor not visited yet
 				if (!visitedList.contains(currentClsc)) {		// We make sure we're not going back to a CLSC we already visited
-					if (currentNode.getTime_() < shortestTime) {
+					// We only save the CLSC if it's a shorter path and if the vehicle can do the move
+					if (neighbor.getTime_() < shortestTime) {
 						nextClsc = currentClsc;
-						shortestTime = currentNode.getTime_();
+						shortestTime = neighbor.getTime_();
 					}
 				}			
 			}
 		}
-		visitedList.add(nextClsc);
-		ClscNode nextNode = map.get(nextClsc);
-		if (nextClsc == destination) {
-			return map.get(nextClsc).getTime_();	// Can also access to the path
+		// Handle when no CLSC has been found TODO Probably useless
+		if (nextClsc == null) {
+			return Integer.MAX_VALUE;
 		}
-		int minutesTaken;
-		while (vehicle.chargeLeft())
-		minutesTaken = Dijkstra(map, visitedList, nextClsc, destination, vehicle);
 		
-		return minutesTaken;
+		// We add the closest CLSC to the list of visited
+		visitedList.add(nextClsc);
+		
+		// We check if we are at the destination, if we're not we keep going until we are
+		if (nextClsc != destination) 
+			return Dijkstra(map, visitedList, nextClsc, destination, vehicle);
+		
+		// If we are, we have to check if the vehicle can move to the CLSC with enough battery
+		ClscNode nextNode = map.get(nextClsc);
+		if (vehicle.moveIsPossible(nextNode.getTime_())) {	// If we can, there's no problem
+			vehicle.travelFor(nextNode.getTime_());
+			return nextNode.getTime_();
+		}
+		
+		// If we can't, we need to find a new path to the destination that passes by a charging station		
+		ClscNode successfulChargePath = findChargingPath(visitedList.get(0), destination, vehicle);
+		
+		// If we have found one, we update the map and return the time it took
+		if (successfulChargePath != null) {
+			map.put(destination, successfulChargePath);
+			return successfulChargePath.getTime_();
+		}
+			
+		
+		// If a Clsc still hasn't been found, it's not possible and we return MAX_VALUE
+		return Integer.MAX_VALUE;
+
+	}
+	
+	private ClscNode findChargingPath(Clsc start, Clsc destination, Vehicle vehicle) {
+		
+		// Stores all the possible paths
+		ArrayList<ClscNode> pathsFound = new ArrayList<ClscNode>();
+
+		// We check every charging station, and try to find those where it's possible to do start -> charge and charge -> destination
+		for (Clsc charge : chargingStations_) {
+			HashMap<Clsc, ClscNode> mapStartToCharge = new HashMap<Clsc, ClscNode>();
+			ArrayList<Clsc> visitedList = new ArrayList<Clsc>();
+			Vehicle vehicleCopy = new Vehicle(vehicle);
+			initialize(mapStartToCharge, visitedList, start, vehicleCopy);
+			
+			// First, from the start to the charge
+			int timeFromStartToCharge = Dijkstra(mapStartToCharge, visitedList, start, charge, vehicleCopy);
+			
+			HashMap<Clsc, ClscNode> mapChargeToDestination = new HashMap<Clsc, ClscNode>();		
+			initialize(mapChargeToDestination, visitedList, charge, vehicleCopy);
+			
+			// Second, from charge to destination
+			int timeFromChargeToDestination = Dijkstra(mapChargeToDestination, visitedList, charge, destination, vehicleCopy);
+			
+			// If a path has been found for both
+			if (timeFromStartToCharge != Integer.MAX_VALUE && timeFromChargeToDestination != Integer.MAX_VALUE) {
+				ClscNode destinationWithCharge = new ClscNode(destination);
+				ClscNode toCharge =  mapStartToCharge.get(charge);
+				ClscNode toDestination =  mapStartToCharge.get(destination);
+				// We combine both of the paths with each other then add the successful path to the list
+				destinationWithCharge = toCharge.combine(toDestination);
+				pathsFound.add(destinationWithCharge);
+			}
+		}
+		
+		// We compare all the paths we found
+		ClscNode best = null;
+		int bestTime = Integer.MAX_VALUE;
+		for (ClscNode current : pathsFound) {
+			if (current.getTime_() < bestTime) {
+				best = current;
+				bestTime = current.getTime_();
+			}
+		}
+		return best;
+		
 	}
 }

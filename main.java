@@ -12,7 +12,7 @@ public class main {
 
 	public static void main(String[] args){
 		
-		Graph graph = readTextFile("/Users/client.INS-TEG0U5C6/Documents/LOG2810/TP1/centresLocaux.txt");
+		Graph graph = readTextFile("/Users/samue/Desktop/POLY/AUT_2018/LOG2810/TP1/LOG2810_TP1/centresLocaux.txt");
 		System.out.println(graph);
 		final String MENU = "(a) Mettre à jour carte.\n"
 							+ "(b) Déterminer le plus court chemin sécuritaire.\n"
@@ -57,6 +57,7 @@ public class main {
 		int startClscID = askStartId(graph.getArray().size());
 		int endClscID = askEndId(graph.getArray().size());
 		boolean invalidEntry = true;
+		String shortestPath = "";
 		while(invalidEntry) {
 			String transportType = JOptionPane.showInputDialog("Choisir le type de transport. \n"
 														 + "(1) Transport à faible risque. \n"
@@ -64,15 +65,15 @@ public class main {
 														 + "(3) Trasport à haut risque. \n");
 			switch (transportType) {
 			case "1":
-				graph.findShortestPath(graph.getArray().get(startClscID - 1), graph.getArray().get(endClscID - 1), Vehicle.LOW_RISK);
+				shortestPath = graph.findShortestPath(graph.getArray().get(startClscID - 1), graph.getArray().get(endClscID - 1), new Vehicle(1));
 				invalidEntry = false;
 				break;
 			case "2":
-				graph.findShortestPath(graph.getArray().get(startClscID - 1), graph.getArray().get(endClscID - 1), Vehicle.MEDIUM_RISK);
+				shortestPath = graph.findShortestPath(graph.getArray().get(startClscID - 1), graph.getArray().get(endClscID - 1), new Vehicle(2));
 				invalidEntry = false;
 				break;
 			case "3":
-				graph.findShortestPath(graph.getArray().get(startClscID - 1), graph.getArray().get(endClscID - 1), Vehicle.HIGH_RISK);
+				shortestPath = graph.findShortestPath(graph.getArray().get(startClscID - 1), graph.getArray().get(endClscID - 1), new Vehicle(3));
 				invalidEntry = false;
 				break;
 			default:
@@ -81,6 +82,7 @@ public class main {
 			}
 			
 		}
+		System.out.println(shortestPath);
 		
 	}
 	

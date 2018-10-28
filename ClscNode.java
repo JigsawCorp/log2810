@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 
 public class ClscNode {
-	private Clsc destination_;
+	private Clsc destination_;		// corresponds to the key
 	private ArrayList<Clsc> pathToPoint_;
-	private int time_;
+	private int time_;		// in minutes
 	
 	public ClscNode(Clsc dest) {
 		destination_ = dest;
@@ -48,6 +48,15 @@ public class ClscNode {
 			pathToPoint_= new ArrayList<Clsc>(clsc.getPathToPoint_());	// Path from the CLSC it came from
 			pathToPoint_.add(destination_);
 		}
+	}
+	
+	public ClscNode combine(ClscNode nodeToAdd) {
+		time_ += nodeToAdd.getTime_() + 120;	// The time of both paths are added and 120 minutes are added for the charge time
+		destination_ = nodeToAdd.getDestination_();			// destination updated to the end CLSC
+		nodeToAdd.getPathToPoint_().remove(0);	// Removed the first element of the second array so there are no duplicates
+		pathToPoint_.addAll(nodeToAdd.getPathToPoint_());	// Both arrays are combined
+		
+		return this;
 	}
 	
 }
