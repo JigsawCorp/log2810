@@ -8,22 +8,9 @@ public class Dijkstra {
 
     public static Vehicle getShortestPath(Clsc startingPoint, Clsc finishPoint, Graph graph, Patient.Type patientType) {
         HashMap<Clsc, Path> shortestPathsFromStart = getAllShortestPaths(startingPoint, graph);
-        Vehicle vehicle = new Vehicle(Vehicle.BatteryType.NI_NH, patientType);
-        // Try to reach destination with the NI_NH battery
-       // if (vehicle.tryToReachDestination(getShortestPathBetweenTwoNodes(startingPoint, finishPoint, shortestPathsFromStart))) {
-        if (vehicle.tryToReachDestination(startingPoint, finishPoint, graph)) {
-            return vehicle;
-        }
-
-        vehicle.setBatteryType(Vehicle.BatteryType.LI_ION);
-        // If that didn't work, try reaching the destination with the LI_ION battery
-        if (vehicle.tryToReachDestination(startingPoint, finishPoint, graph)) {
-            return vehicle;
-        }
-
-        // If that also didn't work, then there is no way to reach the destination an
-       return  null;
-
+        Vehicle vehicle = new Vehicle(patientType);
+        vehicle.getShortestPath(startingPoint, finishPoint, graph);
+        return vehicle;
     }
 
     /**
@@ -35,11 +22,11 @@ public class Dijkstra {
      * the first element is the starting CLSC and the last element is the destination CLSC.
      */
     public static List<Clsc> getShortestPathBetweenTwoNodes(Clsc startNode, Clsc endNode, HashMap<Clsc, Path> pathLengths) {
-        Clsc currentNode = null;
+        Clsc currentNode = endNode;
         List<Clsc> shortestPath = new ArrayList<>();
         shortestPath.add(endNode);
         while (currentNode != startNode) {
-            currentNode = pathLengths.get(endNode).getPreviousNode();
+            currentNode = pathLengths.get(currentNode).getPreviousNode();
             shortestPath.add(currentNode);
         }
         Collections.reverse(shortestPath);

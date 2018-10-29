@@ -21,13 +21,14 @@ public class Vehicle {
     private int fTimeTaken;
     private List<Clsc> fPathTaken;
 
-    public Vehicle(BatteryType batteryType, Patient.Type patientType) {
-        fBatteryType = batteryType;
+    public Vehicle(Patient.Type patientType) {
+        fBatteryType = BatteryType.NI_NH;
         fBatteryPercentage = 100.00;
         fTimeTaken = 0;
         fPatientType = patientType;
-        setBatteryConsumption(patientType, batteryType);
+        setBatteryConsumption(patientType, BatteryType.NI_NH);
         fPathTaken = new ArrayList<>();
+        fCanReachDestination = false;
     }
 
     public Vehicle(Vehicle vehicle) {
@@ -36,7 +37,18 @@ public class Vehicle {
         fPatientType = vehicle.fPatientType;
         fBatteryConsumption = vehicle.fBatteryConsumption;
         fTimeTaken = vehicle.fTimeTaken;
-        fPathTaken = vehicle.fPathTaken;
+        fPathTaken = new ArrayList<>(vehicle.fPathTaken);
+        fCanReachDestination = vehicle.fCanReachDestination;
+    }
+
+    private void copy(Vehicle vehicle) {
+        fBatteryType = vehicle.fBatteryType;
+        fBatteryPercentage = vehicle.fBatteryPercentage;
+        fPatientType = vehicle.fPatientType;
+        fBatteryConsumption = vehicle.fBatteryConsumption;
+        fTimeTaken = vehicle.fTimeTaken;
+        fPathTaken = new ArrayList<>(vehicle.fPathTaken);
+        fCanReachDestination = vehicle.fCanReachDestination;
     }
 
     public void setBatteryType(BatteryType batteryType) {
@@ -54,57 +66,80 @@ public class Vehicle {
         fBatteryPercentage = 100.0;
     }
 
-    public Vehicle getShortestPath(Clsc startPoint, Clsc endPoint, Graph graph, Patient.Type patientType) {
+    public void getShortestPath(Clsc startPoint, Clsc endPoint, Graph graph) {
         //HashMap<Clsc, Path> shortestPathsFromStart = getAllShortestPaths(startingPoint, graph);
-        Vehicle vehicle = new Vehicle(Vehicle.BatteryType.NI_NH, patientType);
         // Try to reach destination with the NI_NH battery
        // if (vehicle.tryToReachDestination(getShortestPathBetweenTwoNodes(startingPoint, finishPoint, shortestPathsFromStart))) {
-        if (vehicle.tryToReachDestination(startPoint, endPoint, startPoint, endPoint, graph, new Vehicle(this)) != null) {
-            return vehicle;
+        if (tryToReachDestination(startPoint, endPoint, startPoint, endPoint, graph)) {
+            fCanReachDestination = true;
+            return;
         }
 
-        vehicle.setBatteryType(Vehicle.BatteryType.LI_ION);
+        setBatteryType(Vehicle.BatteryType.LI_ION);
         resetVehicle();
         // If that didn't work, try reaching the destination with the LI_ION battery
-        if (vehicle.tryToReachDestination(startPoint, endPoint, startPoint, endPoint, graph, this) != null) {
-            return vehicle;
+        if (tryToReachDestination(startPoint, endPoint, startPoint, endPoint, graph)) {
+            fCanReachDestination = true;
         }
 
         // If that also didn't work, then there is no way to reach the destination
-        return  null;
 
     }
 
-    public Vehicle tryToReachDestination(Clsc startPoint, Clsc endPoint, Clsc currentNode, Clsc targetNode, Graph graph, Vehicle vehicle) {
-        List<Clsc> pathToDestination = Dijkstra.getShortestPathBetweenTwoNodes(currentNode, targetNode, Dijkstra.getAllShortestPaths(startPoint, graph));
-        if (reachWithoutStop(pathToDestination, vehicle) != null) {
-            return reachWithoutStop(pathToDestination, new Vehicle(vehicle));
-        }
+    public boolean tryToReachDestination(Clsc startPoint, Clsc endPoint, Clsc currentNode, Clsc targetNode, Graph graph) {
+        System.out.println("tryToReachDestination(), currentNode = " + currentNode + " , targetNode = " + targetNode);
 
         if (currentNode.hasCharge() && currentNode != startPoint) {
             charge();
         }
 
+        List<Clsc> pathToDestination = Dijkstra.getShortestPathBetweenTwoNodes(currentNode, targetNode, Dijkstra.getAllShortestPaths(currentNode, graph));
+        Vehicle newVehicle = new Vehicle(this);
+        if (newVehicle.reachWithoutStop(pathToDestination)) {
+            copy(newVehicle);
+            return true;
+        }
+
+        newVehicle = new Vehicle(this);
         List<Clsc> clscWithTerminal = getReachableChargingTerminals(startPoint, graph);
         Vehicle bestVehiclePath = null;
         for (int i = 0; i < clscWithTerminal.size(); ++i) {
-            new Vehicle(vehicle).tryToReachDestination(startPoint, endPoint, currentNode, clscWithTerminal.get(i) )
-        }
-    }
-
-    private Vehicle reachWithoutStop(List<Clsc> path, Vehicle vehicle) {
-        for (int i = 0; i < path.size() - 1; ++i) {
-            if (tryToReachNode(path.get(i), path.get(i + 1), vehicle)) {
-                return null;
+            Vehicle tempVehicle = new Vehicle(this);
+            if (tempVehicle.tryToReachDestination(startPoint, endPoint, currentNode, clscWithTerminal.get(i), graph)) {
+                if (tempVehicle.tryToReachDestination(startPoint, endPoint, clscWithTerminal.get(i), endPoint, graph))
+                if (bestVehiclePath == null) {
+                    bestVehiclePath = tempVehicle;
+                }
+                else {
+                    if (tempVehicle.fTimeTaken < bestVehiclePath.fTimeTaken) {
+                        bestVehiclePath = tempVehicle;
+                    }
+                }
             }
         }
-        return vehicle;
+
+        if (bestVehiclePath != null) {
+            copy(bestVehiclePath);
+            return true;
+        }
+        return false;
     }
 
-    private boolean tryToReachNode(Clsc startingNode, Clsc nodeToReach, Vehicle vehicle) {
+    private boolean reachWithoutStop(List<Clsc> path) {
+        for (int i = 0; i < path.size() - 1; ++i) {
+            if (!tryToReachNode(path.get(i), path.get(i + 1))) {
+                return false;
+            }
+        }
+        fPathTaken.add(path.get(path.size() - 1));
+        return true;
+    }
+
+    private boolean tryToReachNode(Clsc startingNode, Clsc nodeToReach) {
         if (fBatteryPercentage - calculateBatteryUsage(Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach)) >= 20.0) {
             fBatteryPercentage -= calculateBatteryUsage(Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach));
             fTimeTaken += Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach);
+            fPathTaken.add(startingNode);
             return true;
         }
         return false;
@@ -139,26 +174,28 @@ public class Vehicle {
         }
     }
 
-    private List<Clsc> getReachableChargingTerminals(Clsc currentPosition, Graph graph, Vehicle vehicle) {
+    private List<Clsc> getReachableChargingTerminals(Clsc currentPosition, Graph graph) {
         List<Clsc> reachableTerminals = new ArrayList<>();
-        for (int i = 0; i < graph.getClscWithTerminal().size(); ++i) {
-            if (graph.getClscWithTerminal().get(1) == currentPosition) {
+        for (int i = 1; i < graph.getClscWithTerminal().size(); ++i) {
+            if (graph.getClscWithTerminal().get(i) == currentPosition) {
                 break;
             }
-            if (tryToReachNode(currentPosition, new Vehicle()))
+            if (wentOverTerminalAlready(graph.getClscWithTerminal().get(i))) {
+                break;
+            }
+            Vehicle newVehicle = new Vehicle(this);
+            if (newVehicle.reachWithoutStop(Dijkstra.getShortestPathBetweenTwoNodes(currentPosition, graph.getClscWithTerminal().get(i), Dijkstra.getAllShortestPaths(currentPosition, graph)))) {
+                reachableTerminals.add(graph.getClscWithTerminal().get(i));
+            }
         }
         return reachableTerminals;
     }
 
-    private boolean wentOverNodeTwice(Clsc targetNode) {
-        int counter = 0;
+    private boolean wentOverTerminalAlready(Clsc targetNode) {
         for (int i = 0; i < fPathTaken.size(); ++i) {
-            if (fPathTaken.get(i) == targetNode) {
-                ++counter;
+            if (fPathTaken.contains(targetNode)) {
+                return true;
             }
-        }
-        if (counter >= 2) {
-            return true;
         }
         return false;
     }
