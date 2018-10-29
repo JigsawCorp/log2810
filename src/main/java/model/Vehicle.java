@@ -70,6 +70,7 @@ public class Vehicle {
         //HashMap<Clsc, Path> shortestPathsFromStart = getAllShortestPaths(startingPoint, graph);
         // Try to reach destination with the NI_NH battery
        // if (vehicle.tryToReachDestination(getShortestPathBetweenTwoNodes(startingPoint, finishPoint, shortestPathsFromStart))) {
+        fPathTaken.add(startPoint);
         if (tryToReachDestination(startPoint, endPoint, startPoint, endPoint, graph)) {
             fCanReachDestination = true;
             return;
@@ -131,7 +132,7 @@ public class Vehicle {
                 return false;
             }
         }
-        fPathTaken.add(path.get(path.size() - 1));
+        //fPathTaken.add(path.get(path.size() - 1));
         return true;
     }
 
@@ -139,7 +140,7 @@ public class Vehicle {
         if (fBatteryPercentage - calculateBatteryUsage(Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach)) >= 20.0) {
             fBatteryPercentage -= calculateBatteryUsage(Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach));
             fTimeTaken += Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach);
-            fPathTaken.add(startingNode);
+            fPathTaken.add(nodeToReach);
             return true;
         }
         return false;
