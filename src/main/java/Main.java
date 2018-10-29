@@ -5,16 +5,12 @@ import main.java.utility.FileReadingUtility;
 
 import java.io.*;
 
+/**
+ * Application entry point
+ */
 public class Main {
-
 	public static void main(String[] args){
+		// Start our application logic
 		new Application().start();
 	}
-	
-	/**
-	 * 
-	 * @return graph:  generated with text file.
-	 */
-
-
 }

@@ -6,22 +6,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Represents a Vehicle that gets from a CLSC to another. Used in the algorithm to find the shortest path that this vehicle can take between two nodes.
+ */
 public class Vehicle {
-    public enum BatteryConsumptionPerMinute {
 
-    }
+    // Represents the type of battery of the vehicle
     public enum BatteryType {
         NI_NH, LI_ION
     }
+    // Holds the battery type of the vehicle
     private BatteryType fBatteryType;
+    // Holds the remaining battery percentage
     private double fBatteryPercentage;
+    // Holds the type of patient we are transporting
     private Patient.Type fPatientType;
+    // Holds the battery consumption. Units are in % loss per minute
     private double fBatteryConsumption;
+    // Holds if the vehicle can reach its destination
     private boolean fCanReachDestination;
+    // Holds the time taken to reach its destination
     private int fTimeTaken;
-    private List<Clsc> fPathTaken;
+    // Holds in chronological order which CLSCs the vehicle went to to reach the destination
+    private List<CLSC> fPathTaken;
 
-    public Vehicle(Patient.Type patientType) {
+    /**
+     * Constructor
+     * @param patientType The patient type we are transporting.
+     */
+    private Vehicle(Patient.Type patientType) {
         fBatteryType = BatteryType.NI_NH;
         fBatteryPercentage = 100.00;
         fTimeTaken = 0;
@@ -31,7 +44,11 @@ public class Vehicle {
         fCanReachDestination = false;
     }
 
-    public Vehicle(Vehicle vehicle) {
+    /**
+     * Copy constructor
+     * @param vehicle The vehicle we are copying.
+     */
+    private Vehicle(Vehicle vehicle) {
         fBatteryType = vehicle.fBatteryType;
         fBatteryPercentage = vehicle.fBatteryPercentage;
         fPatientType = vehicle.fPatientType;
@@ -41,6 +58,10 @@ public class Vehicle {
         fCanReachDestination = vehicle.fCanReachDestination;
     }
 
+    /**
+     * Copies all the fields of an existing vehicle. Used in the recursive algorithm to avoid creating new objects.
+     * @param vehicle The vehicle to copy
+     */
     private void copy(Vehicle vehicle) {
         fBatteryType = vehicle.fBatteryType;
         fBatteryPercentage = vehicle.fBatteryPercentage;
@@ -51,23 +72,51 @@ public class Vehicle {
         fCanReachDestination = vehicle.fCanReachDestination;
     }
 
-    public void setBatteryType(BatteryType batteryType) {
+    private void setBatteryType(BatteryType batteryType) {
         fBatteryType = batteryType;
         setBatteryConsumption(fPatientType, batteryType);
     }
 
-    public void charge() {
+    /**
+     * Charges the vehicle. Adds the 120 minutes to fTimeTaken and resets the battery percentage.
+     */
+    private void charge() {
         fTimeTaken += 120;
         fBatteryPercentage = 100.0;
     }
 
+    /**
+     * Resets the vehicle to prepare it for another trip
+     */
     private void resetVehicle() {
         fTimeTaken = 0;
         fBatteryPercentage = 100.0;
     }
 
-    public void getShortestPath(Clsc startPoint, Clsc endPoint, Graph graph) {
-        //HashMap<Clsc, Path> shortestPathsFromStart = getAllShortestPaths(startingPoint, graph);
+    /**
+     * Finds the shortest path a vehicle can take between two nodes. This is the method called by the application
+     * @param startPoint The starting CLSC
+     * @param endPoint The destination CLSC
+     * @param graph The graph that holds all CLSCs
+     * @param patientType The type of patient we are transporting
+     * @return The vehicle its state after the trip. If fCanReachDestination is false, then the vehicle cannot make the trip.
+     */
+    public static Vehicle getShortestPath(CLSC startPoint, CLSC endPoint, Graph graph, Patient.Type patientType) {
+        HashMap<CLSC, Path> shortestPathsFromStart = Dijkstra.getAllShortestPaths(startPoint, graph);
+        Vehicle vehicle = new Vehicle(patientType);
+        vehicle.getShortestPath(startPoint, endPoint, graph);
+        return vehicle;
+    }
+
+
+    /**
+     * Called by getShortestPath to
+     * @param startPoint
+     * @param endPoint
+     * @param graph
+     */
+    private void getShortestPath(CLSC startPoint, CLSC endPoint, Graph graph) {
+        //HashMap<CLSC, Path> shortestPathsFromStart = getAllShortestPaths(startingPoint, graph);
         // Try to reach destination with the NI_NH battery
        // if (vehicle.tryToReachDestination(getShortestPathBetweenTwoNodes(startingPoint, finishPoint, shortestPathsFromStart))) {
         fPathTaken.add(startPoint);
@@ -87,14 +136,14 @@ public class Vehicle {
 
     }
 
-    public boolean tryToReachDestination(Clsc startPoint, Clsc endPoint, Clsc currentNode, Clsc targetNode, Graph graph) {
+    public boolean tryToReachDestination(CLSC startPoint, CLSC endPoint, CLSC currentNode, CLSC targetNode, Graph graph) {
         System.out.println("tryToReachDestination(), currentNode = " + currentNode + " , targetNode = " + targetNode);
 
         if (currentNode.hasCharge() && currentNode != startPoint) {
             charge();
         }
 
-        List<Clsc> pathToDestination = Dijkstra.getShortestPathBetweenTwoNodes(currentNode, targetNode, Dijkstra.getAllShortestPaths(currentNode, graph));
+        List<CLSC> pathToDestination = Dijkstra.getShortestPathBetweenTwoNodes(currentNode, targetNode, Dijkstra.getAllShortestPaths(currentNode, graph));
         Vehicle newVehicle = new Vehicle(this);
         if (newVehicle.reachWithoutStop(pathToDestination)) {
             copy(newVehicle);
@@ -102,12 +151,12 @@ public class Vehicle {
         }
 
         newVehicle = new Vehicle(this);
-        List<Clsc> clscWithTerminal = getReachableChargingTerminals(startPoint, graph);
+        List<CLSC> CLSCWithTerminal = getReachableChargingTerminals(startPoint, graph);
         Vehicle bestVehiclePath = null;
-        for (int i = 0; i < clscWithTerminal.size(); ++i) {
+        for (int i = 0; i < CLSCWithTerminal.size(); ++i) {
             Vehicle tempVehicle = new Vehicle(this);
-            if (tempVehicle.tryToReachDestination(startPoint, endPoint, currentNode, clscWithTerminal.get(i), graph)) {
-                if (tempVehicle.tryToReachDestination(startPoint, endPoint, clscWithTerminal.get(i), endPoint, graph))
+            if (tempVehicle.tryToReachDestination(startPoint, endPoint, currentNode, CLSCWithTerminal.get(i), graph)) {
+                if (tempVehicle.tryToReachDestination(startPoint, endPoint, CLSCWithTerminal.get(i), endPoint, graph))
                 if (bestVehiclePath == null) {
                     bestVehiclePath = tempVehicle;
                 }
@@ -126,7 +175,7 @@ public class Vehicle {
         return false;
     }
 
-    private boolean reachWithoutStop(List<Clsc> path) {
+    private boolean reachWithoutStop(List<CLSC> path) {
         for (int i = 0; i < path.size() - 1; ++i) {
             if (!tryToReachNode(path.get(i), path.get(i + 1))) {
                 return false;
@@ -136,7 +185,7 @@ public class Vehicle {
         return true;
     }
 
-    private boolean tryToReachNode(Clsc startingNode, Clsc nodeToReach) {
+    private boolean tryToReachNode(CLSC startingNode, CLSC nodeToReach) {
         if (fBatteryPercentage - calculateBatteryUsage(Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach)) >= 20.0) {
             fBatteryPercentage -= calculateBatteryUsage(Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach));
             fTimeTaken += Path.getDistanceBetweenTwoNodes(startingNode, nodeToReach);
@@ -175,8 +224,9 @@ public class Vehicle {
         }
     }
 
-    private List<Clsc> getReachableChargingTerminals(Clsc currentPosition, Graph graph) {
-        List<Clsc> reachableTerminals = new ArrayList<>();
+    private List<CLSC> getReachableChargingTerminals(CLSC currentPosition, Graph graph) {
+        //Vehicle testVehicle = new Vehicle(this);
+        List<CLSC> reachableTerminals = new ArrayList<>();
         for (int i = 1; i < graph.getClscWithTerminal().size(); ++i) {
             if (graph.getClscWithTerminal().get(i) == currentPosition) {
                 break;
@@ -192,7 +242,7 @@ public class Vehicle {
         return reachableTerminals;
     }
 
-    private boolean wentOverTerminalAlready(Clsc targetNode) {
+    private boolean wentOverTerminalAlready(CLSC targetNode) {
         for (int i = 0; i < fPathTaken.size(); ++i) {
             if (fPathTaken.contains(targetNode)) {
                 return true;

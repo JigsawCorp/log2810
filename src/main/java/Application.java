@@ -2,6 +2,7 @@ package main.java;
 
 import main.java.model.Graph;
 import main.java.model.Patient;
+import main.java.model.Vehicle;
 import main.java.utility.Dijkstra;
 import main.java.utility.FileReadingUtility;
 
@@ -11,15 +12,24 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 
+/**
+ * Class controlling the logic of the application.
+ */
 public class Application {
+    /**
+     * Main entry point that starts the logic of the application. Parses the default text file and calls the method to read user inputs and react accordingly.
+     */
     public void start() {
+        // Parse the default text file into a graph
         Graph graph = new FileReadingUtility().createGraph(FileReadingUtility.DEFAULT_FILE_PATH);
-        System.out.println(graph.toString());
-        //Dijkstra.getShortestPath(graph.getCLSCs().get(1), Patient.Type.HIGH_RISK, graph, graph.getCLSCs().get(3));
-        Dijkstra.getShortestPath(graph.getCLSCs().get(21), graph.getCLSCs().get(26), graph, Patient.Type.HIGH_RISK);
+        Vehicle.getShortestPath(graph.getCLSCs().get(22), graph.getCLSCs().get(19), graph, Patient.Type.HIGH_RISK);
+        // Call the recursive method the constantly awaits a user input and reacts to it.
         presentChoices();
     }
 
+    /**
+     * A recursive method that constantly asks the user what he wants to do and then reacts to the input accordingly.
+     */
     private void presentChoices() {
         System.out.println("(a) Mettre a jour la carte. \n(b) Determiner le plus court chemin securitaire. \n(c) Extraire un sous-graphe. \n(d) Quitter.");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

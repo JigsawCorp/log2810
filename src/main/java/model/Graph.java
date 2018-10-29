@@ -3,60 +3,72 @@ package main.java.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A model class that represents a non oriented weighted graph.
+ */
 public class Graph {
-	
-	private ArrayList<Clsc> fClscArray;
-	private ArrayList<Clsc> fClscWithTerminals;
-	
+
+	// Holds all the CLSCs including those with charging terminals
+	private ArrayList<CLSC> fCLSCArray;
+	// Holds only the CLSCs with terminals to avoid iterating over fCLSCArray
+	private ArrayList<CLSC> fCLSCWithTerminals;
+
+	/**
+	 * Default constructor
+	 */
 	public Graph() {
-		fClscArray = new ArrayList<Clsc>();
-		fClscWithTerminals = new ArrayList<>();
+		fCLSCArray = new ArrayList<CLSC>();
+		fCLSCWithTerminals = new ArrayList<>();
 	}
-	
+
+	/**
+	 * Adds a CLSC to the arrays. If the CLSC has an array, also add it to fCLSCWithTerminals.
+	 * @param id The id of the CLSC
+	 * @param hasTerminal True if the CLSC has a charging terminal.
+	 */
 	public void addClsc(int id, boolean hasTerminal) {
-		Clsc newClsc = new Clsc(id, hasTerminal);
-		fClscArray.add(newClsc);
+		CLSC newCLSC = new CLSC(id, hasTerminal);
+		fCLSCArray.add(newCLSC);
 		if (hasTerminal) {
-			fClscWithTerminals.add(newClsc);
+			fCLSCWithTerminals.add(newCLSC);
 		}
 	}
 
-	public void addClscPath(int first, int second, int distance) {
-		fClscArray.get(first - 1).getNeigbourghs().put(fClscArray.get(second - 1), distance);
-		fClscArray.get(second - 1).getNeigbourghs().put(fClscArray.get(first - 1), distance);
-	}
 	/**
-	 * 
-	 * @param start -Summit we're starting from
-	 * @param destination -Desired summit
-	 * @return Prints: -Vehicle type, -% remaining, -Shortest Path, -Time
+	 * Adds the paths connecting two CLSCs into their fields. To note: The graph doesn't hold the paths contrary to most implementations.
+	 * The CLSC nodes hold the paths to all their neighbors in their own class.
+	 * @param first The first CLSC
+	 * @param second The second CLSC
+	 * @param distance The distance between these two
 	 */
-	public ArrayList<Clsc> findShortestPath(Clsc start, Clsc destination) {
-		ArrayList<Clsc> shortestPath = new ArrayList<Clsc>();
-		//int time = Dijkstra(shortestPath, start, destination);
-		return shortestPath;
+	public void addClscPath(int first, int second, int distance) {
+		fCLSCArray.get(first - 1).getNeighbors().put(fCLSCArray.get(second - 1), distance);
+		fCLSCArray.get(second - 1).getNeighbors().put(fCLSCArray.get(first - 1), distance);
 	}
-	
-	/*
-	private int Dijkstra(ArrayList<Clsc> path, Clsc start, Clsc destination) {
-		int time;
-		
-		return time;
-	}*/
-	/*public String toString() {
-		return fClscArray.toString() + "\n\n" + pathArray_.toString();
-	}
-	*/
 
-	public List<Clsc> getCLSCs() {
-	    return fClscArray;
+
+	/**
+	 * Getter to fCLSCArray
+	 * @return fCLSCArray
+	 */
+	public List<CLSC> getCLSCs() {
+	    return fCLSCArray;
     }
 
-    public List<Clsc> getClscWithTerminal() {
-		return fClscWithTerminals;
+	/**
+	 * Getter to fCLSCWithTerminals
+	 * @return fCLSCWithTerminals
+	 */
+	public List<CLSC> getClscWithTerminal() {
+		return fCLSCWithTerminals;
 	}
+
+	/**
+	 * Formats the Graph into a String
+	 * @return A formatted graph
+	 */
 	public String toString() {
-		for (int i = 0; i < fClscArray.size(); ++i) {
+		for (int i = 0; i < fCLSCArray.size(); ++i) {
 			System.out.print("CLSC_" + i + ", ");
 		}
 		return null;
