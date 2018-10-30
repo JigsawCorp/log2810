@@ -195,10 +195,20 @@ public class Vehicle {
         return false;
     }
 
+    /**
+     *
+     * @param duration
+     * @return
+     */
     public double calculateBatteryUsage(Integer duration) {
         return duration * fBatteryConsumption;
     }
 
+    /**
+     * Sets the battery consumption of the vehicle in % loss per minute.
+     * @param patientType The type of patient we are transporting
+     * @param batteryType The type of battery we are using
+     */
     private void setBatteryConsumption(Patient.Type patientType, BatteryType batteryType) {
         if (batteryType == BatteryType.NI_NH) {
             if (patientType == Patient.Type.LOW_RISK) {
@@ -224,6 +234,12 @@ public class Vehicle {
         }
     }
 
+    /**
+     * Finds all the charging terminals the vehicle can access from its current node and its state.
+     * @param currentPosition The position the vehicle is at currently.
+     * @param graph The graph representing all CLSCs
+     * @return A list of all CLSCs with charging terminals the vehicle can reach.
+     */
     private List<CLSC> getReachableChargingTerminals(CLSC currentPosition, Graph graph) {
         //Vehicle testVehicle = new Vehicle(this);
         List<CLSC> reachableTerminals = new ArrayList<>();
@@ -242,6 +258,11 @@ public class Vehicle {
         return reachableTerminals;
     }
 
+    /**
+     * Indicated wheather or not the vehicle already went over a certain charging terminal
+     * @param targetNode Is the node we want to know if we went over already.
+     * @return True if we went over the node already, false if not.
+     */
     private boolean wentOverTerminalAlready(CLSC targetNode) {
         for (int i = 0; i < fPathTaken.size(); ++i) {
             if (fPathTaken.contains(targetNode)) {
@@ -251,6 +272,22 @@ public class Vehicle {
         return false;
     }
 
+    /**
+     * Takes important attributes of the vehicle and turns them into a string.
+     * @return A string describing the vehicle's state.
+     */
+    @Override
+    public String toString() {
+        String result = "";
+        if (fCanReachDestination) {
+            result += "Le type de vehicle utilise est " + fBatteryType + ", le pourcentage de batterie restant est " + fBatteryPercentage + "%, le chemin" +
+                    " utilise le plus court est " + fPathTaken + ", et la longueur de celui-ci est de " + fTimeTaken + " minutes";
+        }
+        else {
+            result += "Desole, le transport est refuse";
+        }
+        return result;
+    }
 
 
 

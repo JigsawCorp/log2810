@@ -19,7 +19,7 @@ public class FileReadingUtility {
      * @param fileName Path to a text file to parse into a graph
      * @return A graph made from the text file
      */
-    public Graph createGraph(String fileName) {
+    public static Graph createGraph(String fileName) {
         Graph graph = new Graph();
 
         InputStream inputStream = Main.class.getResourceAsStream(fileName);
