@@ -15,5 +15,4 @@ public class Path {
 	public int getTime() {
 		return time_;
 	}
-	
 }

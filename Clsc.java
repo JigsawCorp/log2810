@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Clsc {
+public class Clsc implements Comparable<Clsc> {
 	
 	int id_;
 	boolean hasTerminal_;
@@ -37,4 +37,7 @@ public class Clsc {
 		return 0;
 	}
 	
+	public int compareTo(Clsc other) {
+		return Integer.compare(id_, other.id_);
+	}
 }

@@ -29,6 +29,12 @@ public class Vehicle {
 		battery_ = 100;
 	}
 	
+	public Vehicle(int transportType, int vehicleType) {
+		this(transportType);
+		if (vehicleType == 2)
+			switchType();
+	}
+	
 	// Copy constructor, we only want to copy the risk level and the multiplier. The battery is set to full.
 	public Vehicle(Vehicle copy) {
 		RISK_LEVEL = copy.RISK_LEVEL;
@@ -38,6 +44,10 @@ public class Vehicle {
 	
 	public double chargeLeft() {
 		return battery_;
+	}
+	
+	public double chargeLeftAfter(int time) {
+		return battery_ - time * multiplier_;
 	}
 	
 	public void charge() {

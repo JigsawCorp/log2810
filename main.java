@@ -1,18 +1,30 @@
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.invoke.ConstantCallSite;
+import java.security.spec.DSAGenParameterSpec;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
 import org.omg.CORBA.DynAnyPackage.Invalid;
 
+/*
+ * Test 23 -> 20	=> erreur, stack overflow
+ */
+
 public class main {
 
 	public static void main(String[] args){
-		
-		Graph graph = readTextFile("/Users/samue/Desktop/POLY/AUT_2018/LOG2810/TP1/LOG2810_TP1/centresLocaux.txt");
+		// "/Users/samue/Desktop/POLY/AUT_2018/LOG2810/TP1/LOG2810_TP1/centresLocaux.txt"
+		Graph graph = new Graph(null, null);
+		try {
+			graph = readTextFile("centresLocaux.txt");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println(graph);
 		final String MENU = "(a) Mettre à jour carte.\n"
 							+ "(b) Déterminer le plus court chemin sécuritaire.\n"
@@ -48,8 +60,18 @@ public class main {
 	 * @param graph: graph to modify
 	 */
 	private static void updateGraph(Graph graph) {
-		String newGraphFile = JOptionPane.showInputDialog("Entrer le nom du fichier texte de la nouvelle carte avec son chemin.");
-		graph = readTextFile(newGraphFile);
+		boolean fichierInvalide = true;
+		while (fichierInvalide) {
+			try {
+				fichierInvalide = false;
+				String newGraphFile = JOptionPane.showInputDialog("Entrer le nom du fichier texte de la nouvelle carte avec son chemin.");
+				graph = readTextFile(newGraphFile);
+			} catch (Exception e) {
+				fichierInvalide =true;
+				System.out.println("DSA");
+			}
+			
+		}
 		System.out.println(graph);
 	}
 	
@@ -128,19 +150,30 @@ public class main {
 			String vehicleType = JOptionPane.showInputDialog("Choisir le type de vehicule. \n"
 																 + "(1) Véhicule médicalisé NI-NH. \n"
 																 + "(2) Véhicule médicalisé LI-ion. \n");
+			int vType;
 			switch (vehicleType) {
 			case "1":
-				//graph.findLongestPath(clscId, NI-NH);
+				vType = 1;
+				//System.out.println(graph.findLongestPath(clscId, new Vehicle(1)));
 				invalidEntry = false;
 				break;
 			case "2":
-				//graph.findLongestPath(clscId, LI-ion);
+				vType = 2;
+				//System.out.println(graph.findLongestPath(clscId, new Vehicle(1)));
 				invalidEntry = false;
 				break;
 			default:
+				vType = 1;
 				System.out.println("L'entrée pour le type de véhicule est invalide!");
 				break;
 			}
+			
+			String patientType = JOptionPane.showInputDialog("Choisir le type de vehicule. \n"
+					 + "(1) Faible risque \n"
+					 + "(2) Moyen risque \n"
+					 + "(3) Haut risque \n");
+			int pType = Integer.parseInt(patientType);
+			System.out.println(graph.findLongestPath(clscId, new Vehicle(pType, vType)));
 		}
 		
 	}
@@ -164,8 +197,9 @@ public class main {
 	/**
 	 * Reads a text file associated to a graph.
 	 * @return graph:  generated with text file.
+	 * @throws FileNotFoundException 
 	 */
-	private static  Graph readTextFile(String nomFichier) {
+	private static  Graph readTextFile(String nomFichier) throws FileNotFoundException {
 		
 		ArrayList<Clsc> clscArray = new ArrayList<Clsc>();
 		ArrayList<Clsc> clscBorne = new ArrayList<Clsc>();
@@ -181,9 +215,9 @@ public class main {
 			// Read first series of numbers that represents the Clsc's id and the presence of an electrical terminal or not.
 			while (!((currentLine = br.readLine()).equals(""))) {
 				String[] splitLine = currentLine.split(",");
-				Clsc clsc = new Clsc(Integer.parseInt(splitLine[0]), splitLine[1] != "0");
+				Clsc clsc = new Clsc(Integer.parseInt(splitLine[0]), splitLine[1].equals("1"));
 				clscArray.add(clsc);
-				if(splitLine[1] == "0") 
+				if(clsc.hasCharge()) 
 					clscBorne.add(clsc);
 			}
 			// Read the second series of numbers that represents a specific path and its crossing time.
@@ -195,8 +229,10 @@ public class main {
 
 		} catch (IOException e) {
 			// Pour s'assurer que le fichier n'est pas vide.
-			e.printStackTrace();
+			//e.printStackTrace();
+			throw new FileNotFoundException();
 		}
+
 		Graph graph = new Graph(clscArray,clscBorne);
 		return graph;
 	}
