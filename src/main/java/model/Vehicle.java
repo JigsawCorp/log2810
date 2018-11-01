@@ -150,7 +150,6 @@ public class Vehicle {
             return true;
         }
 
-        newVehicle = new Vehicle(this);
         List<CLSC> CLSCWithTerminal = getReachableChargingTerminals(startPoint, graph);
         Vehicle bestVehiclePath = null;
         for (int i = 0; i < CLSCWithTerminal.size(); ++i) {
