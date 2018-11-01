@@ -24,6 +24,7 @@ public class Application {
     public void start() {
         // Parse the default text file into a graph
         fGraph= FileReadingUtility.createGraph(FileReadingUtility.DEFAULT_FILE_PATH);
+        System.out.println(Vehicle.getLongestPath(fGraph.getCLSCs().get(2), Vehicle.BatteryType.NI_NH, Patient.Type.MEDIUM_RISK));
         //Vehicle.getShortestPath(graph.getCLSCs().get(22), graph.getCLSCs().get(19), graph, Patient.Type.HIGH_RISK);
         // Call the recursive method the constantly awaits a user input and reacts to it.
         presentChoices();

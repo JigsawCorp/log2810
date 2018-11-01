@@ -5,6 +5,7 @@ import main.java.utility.Dijkstra;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Vehicle that gets from a CLSC to another. Used in the algorithm to find the shortest path that this vehicle can take between two nodes.
@@ -269,6 +270,48 @@ public class Vehicle {
             }
         }
         return false;
+    }
+
+    private void tryToReachNeighbors(CLSC startCLSC, ArrayList<CLSC> allVisited) {
+        Vehicle bestVehicle = null;
+        for (Map.Entry<CLSC, Integer> entry : startCLSC.getNeighbors().entrySet()) {
+            Vehicle newVehicle = new Vehicle(this);
+            if (fPathTaken.contains(entry.getKey())) {
+                continue;
+            }
+            ArrayList<CLSC> pathToNextNode = new ArrayList<CLSC>();
+            pathToNextNode.add(startCLSC);
+            pathToNextNode.add(entry.getKey());
+            if (newVehicle.reachWithoutStop(pathToNextNode)) {
+                if (!allVisited.contains(entry.getKey())) {
+                    allVisited.add(entry.getKey());
+                }
+                newVehicle.tryToReachNeighbors(entry.getKey(), allVisited);
+                if (bestVehicle == null) {
+                    bestVehicle = newVehicle;
+                }
+                else {
+                    if (newVehicle.fTimeTaken > bestVehicle.fTimeTaken) {
+                        bestVehicle = newVehicle;
+                    }
+                }
+            }
+        }
+        if (bestVehicle == null) {
+        }
+        else {
+            copy(bestVehicle);
+        }
+    }
+
+    public static String getLongestPath(CLSC startCLSC, BatteryType batteryType, Patient.Type patientType) {
+        ArrayList<CLSC> visitedCLSCs = new ArrayList<>();
+        visitedCLSCs.add(startCLSC);
+        Vehicle testVehicle = new Vehicle(patientType);
+        testVehicle.setBatteryType(batteryType);
+        testVehicle.tryToReachNeighbors(startCLSC, visitedCLSCs);
+        String result = "Longest path is " + testVehicle.fPathTaken;
+        return result;
     }
 
     /**
