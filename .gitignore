@@ -2,3 +2,6 @@
 *.iml
 *.xml
 .metadata
+TP2/TP2/.classpath
+TP2/TP2/.project
+TP2/TP2/.settings/org.eclipse.jdt.core.prefs
