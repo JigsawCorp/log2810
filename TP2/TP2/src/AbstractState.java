@@ -14,6 +14,9 @@ public abstract class AbstractState {
 	 * @param remainingChars : Queue of chars with the rest of the transitions to place
 	 */
 	public void addStatesFrom(Queue<Character> remainingChars) {
+		if (remainingChars.size() == 0) {
+			System.out.println("test");
+		}
 		char transition = remainingChars.poll();
 		
 		if (!nextStates.containsKey(transition)) {

@@ -29,7 +29,7 @@ public class State extends AbstractState {
 		return terminalStates;
 	}
 	
-	// TODO Améliorier nom
+	// TODO Ameliorier nom
 	/**
 	 * Recursive method, adds itself first so it displays in alphabetical order
 	 * @param terminalStates : list of terminal states

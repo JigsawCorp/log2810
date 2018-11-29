@@ -56,6 +56,10 @@ public class Lexicon extends AbstractState {
 	    return top5;
     }
 
+    public Map<Character, State> getNextStates() {
+	    return nextStates;
+    }
+
 
 	
 }
