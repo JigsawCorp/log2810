@@ -3,20 +3,23 @@ import java.util.Queue;
 
 public abstract class AbstractState {
 	
-	private HashMap<Character,Node> nextStates;
+	protected String value;
+	protected HashMap<Character,State> nextStates;
 	
-	public void addState(Queue<Character> remainingChars) {
+	public void addStatesFrom(Queue<Character> remainingChars) {
 		char transition = remainingChars.poll();
 		
 		if (!nextStates.containsKey(transition)) {
-			nextStates.put(transition, new Node(value + transition, false));
+			if (remainingChars.isEmpty()) {
+				nextStates.put(transition, new State(value + transition, true));
+				return;
+			}
+			else {
+				nextStates.put(transition, new State(value + transition, false));
+			}
 		}
 		
-		if (remainingChars.size() == 1) {
-			
-		}
-			
-		nextStates.get(transition).addState(nextState.);
+		nextStates.get(transition).addStatesFrom(remainingChars);		
 	}
 
 	// has transition
@@ -24,7 +27,7 @@ public abstract class AbstractState {
 		return nextStates.containsKey(transition);
 	}
 	
-	public Node getState(char transition) {
+	public State getState(char transition) {
 		return nextStates.get(transition);
 	}
 }
