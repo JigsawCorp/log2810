@@ -40,7 +40,7 @@ public class Lexicon extends AbstractState {
                     string.offer(currentLine.charAt(i));
                 }
                 // Add the necessary amount of states in our state machine to create a path to our word
-                lexicon.addState(string);
+                lexicon.addStatesFrom(string);
             }
         } catch (IOException e) {
             // To avoid empty files
