@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 public class State extends AbstractState {
 	
@@ -44,5 +43,13 @@ public class State extends AbstractState {
 		for (Map.Entry<Character, State> entry : nextStates.entrySet()) {
 			nextStates.get(entry.getKey()).getNextTerminalStates(terminalStates);
 		}
+	}
+	
+	public void choose() {
+		++nUsages;
+	}
+	
+	public int getNUsages() {
+		return nUsages;
 	}
 }
