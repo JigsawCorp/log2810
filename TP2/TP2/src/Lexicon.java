@@ -12,39 +12,41 @@ import java.util.Queue;
 /**
  * Class that does everything
  */
-public class Lexicon {
+public class Lexicon extends AbstractState {
 	
-	private Map<Character, Node> startStates;
-	private Node currentNode;
-	private Queue<Node> top5;
+	private State currentNode;
+	private Queue<State> top5;
 
 	public Lexicon() {
 	    top5 = new LinkedList<>();
-	    startStates = new HashMap<>();
+	    value = "";
     }
 	
 	public static Lexicon newLexicon(String file) {
-		Lexicon lexicon = new Lexicon();
+        Lexicon lexicon = new Lexicon();
         InputStream inputStream = Main.class.getResourceAsStream(file);
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
+            // Holds the current line
             String currentLine;
-
+            // Read every line in the lexicon
             while (!(currentLine = br.readLine()).isEmpty()) {
+                // Create a queue that will act as a string, but we will pop the first characters in addState()
                 Queue<Character> string = new LinkedList<>();
+                // For every character in the current line
                 for (int i = 0; i < currentLine.length(); ++i) {
+                    // Add that character in the queue, so that it it will form a list of chars and mimic a string
                     string.offer(currentLine.charAt(i));
                 }
+                // Add the necessary amount of states in our state machine to create a path to our word
                 lexicon.addState(string);
             }
-
-
         } catch (IOException e) {
-            // Pour s'assurer que le fichier n'est pas vide.
+            // To avoid empty files
             e.printStackTrace();
-	}
-
+        }
+        return lexicon;
+    }
 	
 }
