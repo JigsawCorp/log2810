@@ -28,7 +28,7 @@ public abstract class AbstractState {
 		
 		nextStates.get(transition).addStatesFrom(remainingChars);		
 	}
-
+	
 	// has transition
 	public boolean hasState(char transition) {
 		return nextStates.containsKey(transition);

@@ -3,6 +3,7 @@ import com.sun.tools.javac.Main;
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -11,7 +12,7 @@ import java.util.Queue;
  */
 public class Lexicon extends AbstractState {
 
-	private State currentNode;
+	private State currentState;
 	private Queue<State> top5;
 
 	public Lexicon() {
@@ -47,6 +48,17 @@ public class Lexicon extends AbstractState {
         return lexicon;
     }
 
+	// TODO nom à élaborer
+	/**
+	 * Modifies the currentState and returns all the terminal states from it
+	 * @param transition : transition from the current state to the new state
+	 * @return the list of states from the current state
+	 */
+	public List<State> nextState(char transition) {
+		currentState = currentState.getState(transition);
+		return currentState.getAllTerminalStates();
+	}
+	
     public void addToQueue(State state) {
 	    top5.poll();
 	    top5.offer(state);
