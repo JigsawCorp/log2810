@@ -10,15 +10,29 @@ import java.util.Queue;
 /**
  * Class that does everything
  */
-public class Lexicon extends AbstractState {
+public class Lexicon  {
 
-	private State currentState;
+	private State currentState ;
+	private State startState;
 	private Queue<State> top5;
 
 	public Lexicon() {
-	    top5 = new LinkedList<>();
-	    nextStates = new HashMap<>();
-	    value = "";
+	    top5 = new LinkedList<>() {
+            public boolean add(State state) {
+                boolean result;
+                if(this.size() < 5)
+                    result = super.add(state);
+                else
+                {
+                    super.removeFirst();
+                    result = super.add(state);
+                }
+                return result;
+            }
+        };
+
+	    currentState = new State("", false);
+	    startState = currentState;
     }
 
 	public static Lexicon newLexicon(String path) {
@@ -39,7 +53,7 @@ public class Lexicon extends AbstractState {
                     string.offer(currentLine.charAt(i));
                 }
                 // Add the necessary amount of states in our state machine to create a path to our word
-                lexicon.addStatesFrom(string);
+                lexicon.startState.addStatesFrom(string);
             }
         } catch (IOException e) {
             // To avoid empty files
@@ -55,21 +69,29 @@ public class Lexicon extends AbstractState {
 	 * @return the list of states from the current state
 	 */
 	public List<State> nextState(char transition) {
-		currentState = currentState.getState(transition);
-		return currentState.getAllTerminalStates();
+	    if (currentState.hasState(transition)) {
+	        currentState= currentState.getState(transition);
+	        return currentState.getAllTerminalStates();
+        }
+	    return null;
 	}
-	
-    public void addToQueue(State state) {
-	    top5.poll();
-	    top5.offer(state);
+
+	public boolean chooseCurrentState() {
+	    if (currentState.isTerminal()) {
+            currentState.choose();
+            top5.add(currentState);
+            return true;
+        }
+        return false;
     }
 
     public Queue<State> getTop5() {
 	    return top5;
     }
 
-    public Map<Character, State> getNextStates() {
-	    return nextStates;
+
+    public State getCurrentState() {
+	    return currentState;
     }
 
 

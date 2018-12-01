@@ -1,12 +1,11 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class State extends AbstractState {
+public class State {
 	
 	private boolean isTerminal;
 	private int nUsages;
+	protected String value;
+	protected HashMap<Character,State> nextStates;
 	
 	public State(String value, boolean isTerminal) {
 		this.value = value;
@@ -14,7 +13,26 @@ public class State extends AbstractState {
 		this.nextStates = new HashMap<>();
 		this.nUsages = 0;
 	}
-	
+
+	public void addStatesFrom(Queue<Character> remainingChars) {
+		if (remainingChars.size() == 0) {
+			System.out.println("test");
+		}
+		char transition = remainingChars.poll();
+
+		if (!nextStates.containsKey(transition)) {
+			if (remainingChars.isEmpty()) {
+				nextStates.put(transition, new State(value + transition, true));
+				return;
+			}
+			else {
+				nextStates.put(transition, new State(value + transition, false));
+			}
+		}
+
+		nextStates.get(transition).addStatesFrom(remainingChars);
+	}
+
 	/**
 	 * Public method used to call the recursive method getNextTerminalStates()
 	 * @return terminalStates : ArrayList of all the terminal states
@@ -51,5 +69,17 @@ public class State extends AbstractState {
 	
 	public int getNUsages() {
 		return nUsages;
+	}
+
+	public boolean isTerminal() {
+		return isTerminal;
+	}
+
+	public boolean hasState(char transition) {
+		return nextStates.containsKey(transition);
+	}
+
+	public State getState(char transition) {
+		return nextStates.get(transition);
 	}
 }

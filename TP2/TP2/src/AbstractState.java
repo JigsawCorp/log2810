@@ -1,6 +1,7 @@
 import java.util.HashMap;
 import java.util.Queue;
 
+
 /**
  * Abstract State implemented by Lexicon and State
  */
@@ -29,7 +30,7 @@ public abstract class AbstractState {
 			}
 		}
 		
-		nextStates.get(transition).addStatesFrom(remainingChars);		
+		//nextStates.get(transition).addStatesFrom(remainingChars);
 	}
 	
 	// has transition
