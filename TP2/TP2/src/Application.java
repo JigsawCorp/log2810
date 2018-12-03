@@ -10,11 +10,11 @@ public class Application {
         Lexicon lexicon = Lexicon.newLexicon(DEFAULT_PATH + "lexique6.txt");
         List<State> states = lexicon.getCurrentState().getAllTerminalStates();
         for (int i = 0; i < states.size(); ++i) {
-            System.out.println(states.get(i).value);
+            System.out.println(states.get(i).getValue());
         }
         while (true) {
             if (lexicon.getCurrentState() != null) {
-                System.out.println("Current word is:" + lexicon.getCurrentState().value + ", please enter an other character:");
+                System.out.println("Current word is:" + lexicon.getCurrentState().getValue() + ", please enter an other character:");
             }
             else {
                 System.out.println("Please enter a character");
@@ -29,7 +29,7 @@ public class Application {
             }
             else {
                 for (int i = 0; i < nextStates.size(); ++i) {
-                    System.out.println(nextStates.get(i).value);
+                    System.out.println(nextStates.get(i).getValue());
                 }
             }
         }

@@ -4,8 +4,8 @@ public class State {
 	
 	private boolean isTerminal;
 	private int nUsages;
-	protected String value;
-	protected HashMap<Character,State> nextStates;
+	private String value;
+	private HashMap<Character,State> nextStates;
 	
 	public State(String value, boolean isTerminal) {
 		this.value = value;
@@ -81,5 +81,9 @@ public class State {
 
 	public State getState(char transition) {
 		return nextStates.get(transition);
+	}
+
+	public String getValue() {
+		return value;
 	}
 }
