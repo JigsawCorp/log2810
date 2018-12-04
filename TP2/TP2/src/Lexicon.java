@@ -50,7 +50,7 @@ public class Lexicon  {
                 // For every character in the current line
                 for (int i = 0; i < currentLine.length(); ++i) {
                     // Add that character in the queue, so that it it will form a list of chars and mimic a string
-                    string.offer(currentLine.charAt(i));
+                    string.offer(Character.toLowerCase(currentLine.charAt(i)));
                 }
                 // Add the necessary amount of states in our state machine to create a path to our word
                 lexicon.startState.addStatesFrom(string);
@@ -80,6 +80,7 @@ public class Lexicon  {
 	    if (currentState.isTerminal()) {
             currentState.choose();
             top5.add(currentState);
+            currentState = startState;
             return true;
         }
         return false;
