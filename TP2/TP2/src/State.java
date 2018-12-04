@@ -52,4 +52,8 @@ public class State extends AbstractState {
 	public int getNUsages() {
 		return nUsages;
 	}
+	
+	public boolean isTerminal() {
+		return isTerminal;
+	}
 }

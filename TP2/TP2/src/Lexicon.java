@@ -1,5 +1,3 @@
-import com.sun.tools.javac.Main;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,6 +17,7 @@ public class Lexicon extends AbstractState {
 	    top5 = new LinkedList<>();
 	    nextStates = new HashMap<>();
 	    value = "";
+	    currentState = new State("", false);
     }
 
 	public static Lexicon newLexicon(String path) {
@@ -39,7 +38,7 @@ public class Lexicon extends AbstractState {
                     string.offer(currentLine.charAt(i));
                 }
                 // Add the necessary amount of states in our state machine to create a path to our word
-                lexicon.addStatesFrom(string);
+                lexicon.currentState.addStatesFrom(string);
             }
         } catch (IOException e) {
             // To avoid empty files
@@ -55,7 +54,12 @@ public class Lexicon extends AbstractState {
 	 * @return the list of states from the current state
 	 */
 	public List<State> nextState(char transition) {
+
+		if (!currentState.hasState(transition))
+			return null;
+		
 		currentState = currentState.getState(transition);
+		
 		return currentState.getAllTerminalStates();
 	}
 	
@@ -64,6 +68,10 @@ public class Lexicon extends AbstractState {
 	    top5.offer(state);
     }
 
+    public void resetCurrent() {
+    	currentState = new State("", false);
+    }
+    
     public Queue<State> getTop5() {
 	    return top5;
     }
@@ -72,6 +80,8 @@ public class Lexicon extends AbstractState {
 	    return nextStates;
     }
 
-
+    public State getCurrentState() {
+    	return currentState;
+    }
 	
 }

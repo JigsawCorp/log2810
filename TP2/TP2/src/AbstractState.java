@@ -40,4 +40,8 @@ public abstract class AbstractState {
 	public State getState(char transition) {
 		return nextStates.get(transition);
 	}
+	
+	public String getValue() {
+		return value;
+	}
 }
