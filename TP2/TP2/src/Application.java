@@ -1,13 +1,28 @@
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 public class Application {
-    private static final String DEFAULT_PATH = "/TP2/lexiques/";
+    //private static final String DEFAULT_PATH = "/lexiques/";
 
     public void start() {
-        Lexicon lexicon = Lexicon.newLexicon(DEFAULT_PATH + "lexique6.txt");
+    	/**
+    	 * Launch the application.
+    	 */
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Interface frame = new Interface();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+    	
+        /*Lexicon lexicon = Lexicon.newLexicon(DEFAULT_PATH + "lexique6.txt");
         List<State> states = lexicon.getCurrentState().getAllTerminalStates();
         for (int i = 0; i < states.size(); ++i) {
             System.out.println(states.get(i).value);
@@ -32,6 +47,6 @@ public class Application {
                     System.out.println(nextStates.get(i).value);
                 }
             }
-        }
+        }*/
     }
 }
