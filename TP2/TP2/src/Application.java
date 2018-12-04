@@ -1,20 +1,35 @@
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 public class Application {
-    private static final String DEFAULT_PATH = "/TP2/lexiques/";
+    //private static final String DEFAULT_PATH = "/lexiques/";
 
     public void start() {
-        Lexicon lexicon = Lexicon.newLexicon(DEFAULT_PATH + "lexique6.txt");
+    	/**
+    	 * Launch the application.
+    	 */
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Interface frame = new Interface();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+    	
+        /*Lexicon lexicon = Lexicon.newLexicon(DEFAULT_PATH + "lexique6.txt");
         List<State> states = lexicon.getCurrentState().getAllTerminalStates();
         for (int i = 0; i < states.size(); ++i) {
-            System.out.println(states.get(i).getValue());
+            System.out.println(states.get(i).value);
         }
         while (true) {
             if (lexicon.getCurrentState() != null) {
-                System.out.println("Current word is:" + lexicon.getCurrentState().getValue() + ", please enter an other character:");
+                System.out.println("Current word is:" + lexicon.getCurrentState().value + ", please enter an other character:");
             }
             else {
                 System.out.println("Please enter a character");
@@ -29,9 +44,9 @@ public class Application {
             }
             else {
                 for (int i = 0; i < nextStates.size(); ++i) {
-                    System.out.println(nextStates.get(i).getValue());
+                    System.out.println(nextStates.get(i).value);
                 }
             }
-        }
+        }*/
     }
 }
