@@ -1,12 +1,14 @@
 import java.io.*;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
 /**
- * Class that does everything
+ * Mediator between the States and the Application/Interface
+ * @attributes 	- currentState : Holds the current state from the user's inputs
+ * 				- startState : The initial state, used for the automaton's instanciation and on reset
+ * 				- top5 : Queue/LinkedList (FIFO) that holds the 5 most recent words used. The add()
+ * 						method has been overloaded to have a capacity of 5 and handle duplicates.
  */
 public class Lexicon  {
 
@@ -18,20 +20,19 @@ public class Lexicon  {
 	    top5 = new LinkedList<State>() {
             public boolean add(State state) {
                 boolean result;
-                if(this.size() < 5)
+                if (super.contains(state)) {
+            		// If the word we choose is already in the top 5, we
+            		// just want to push it in the back of the list. So,
+                	// we have to remove it from the list first.
+            		super.remove(state);
+            	}
+                
+                if (this.size() < 5)
                     result = super.add(state);
                 else {
-                	if (super.contains(state)) {
-                		// If the word we choose is already in the top 5, we
-                		// just want to push it in the back of the list.
-                		int duplicateIndex = super.indexOf(state);
-                		super.remove(duplicateIndex);
-                	}
-                	else {
-                		super.getFirst().setIsTop5(false);
-	                    super.removeFirst();
-                	}
-                    result = super.add(state);
+                	super.getFirst().setIsTop5(false);
+                	super.removeFirst();
+                	result = super.add(state);
                 }
                 return result;
             }
@@ -81,6 +82,10 @@ public class Lexicon  {
 	    return null;
 	}
 
+	/**
+	 * Adds the currentState to the top5, chooses the current state then resets it.
+	 * @return true if terminal state has been chosen, false otherwise
+	 */
 	public boolean chooseCurrentState() {
 	    if (currentState.isTerminal()) {
             top5.add(currentState);
@@ -91,15 +96,19 @@ public class Lexicon  {
         return false;
     }
 
+	/**
+	 * Getters
+	 */
     public Queue<State> getTop5() {
 	    return top5;
     }
-
-
     public State getCurrentState() {
 	    return currentState;
     }
     
+    /**
+     * Resets the currentState to the startState without doing anything else
+     */
     public void reset() {
     	currentState = startState;
     }
