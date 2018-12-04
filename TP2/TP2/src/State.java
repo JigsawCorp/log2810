@@ -3,6 +3,7 @@ import java.util.*;
 public class State {
 	
 	private boolean isTerminal;
+	private boolean isTop5;
 	private int nUsages;
 	protected String value;
 	protected HashMap<Character,State> nextStates;
@@ -65,6 +66,7 @@ public class State {
 	
 	public void choose() {
 		++nUsages;
+		isTop5 = true;
 	}
 	
 	public int getNUsages() {
@@ -75,11 +77,22 @@ public class State {
 		return isTerminal;
 	}
 
+	public boolean isTop5() {
+		return isTop5;
+	}
+	
+	public void setIsTop5(boolean top) {
+		isTop5 = top;
+	}
+	
 	public boolean hasState(char transition) {
 		return nextStates.containsKey(transition);
 	}
 
 	public State getState(char transition) {
 		return nextStates.get(transition);
+	}
+	public String getValue() {
+		return value;
 	}
 }
