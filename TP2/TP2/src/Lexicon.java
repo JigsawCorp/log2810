@@ -6,7 +6,7 @@ import java.util.Queue;
 /**
  * Mediator between the States and the Application/Interface
  * @attributes 	- currentState : Holds the current state from the user's inputs
- * 				- startState : The initial state, used for the automaton's instanciation and on reset
+ * 				- startState : The initial state, used for the automaton's instantiation and on reset
  * 				- top5 : Queue/LinkedList (FIFO) that holds the 5 most recent words used. The add()
  * 						method has been overloaded to have a capacity of 5 and handle duplicates.
  */
