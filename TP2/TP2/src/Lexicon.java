@@ -1,3 +1,5 @@
+import com.sun.tools.javac.Main;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,14 +17,13 @@ public class Lexicon  {
 	private Queue<State> top5;
 
 	public Lexicon() {
-	    top5 = new LinkedList<State>() {
+	    top5 = new LinkedList<>() {
             public boolean add(State state) {
                 boolean result;
                 if(this.size() < 5)
                     result = super.add(state);
                 else
                 {
-                	super.getFirst().setIsTop5(false);
                     super.removeFirst();
                     result = super.add(state);
                 }
@@ -79,7 +80,6 @@ public class Lexicon  {
 	    if (currentState.isTerminal()) {
             currentState.choose();
             top5.add(currentState);
-            currentState = startState;
             return true;
         }
         return false;
@@ -92,10 +92,6 @@ public class Lexicon  {
 
     public State getCurrentState() {
 	    return currentState;
-    }
-    
-    public void reset() {
-    	currentState = startState;
     }
 
 
