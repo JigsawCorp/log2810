@@ -57,6 +57,7 @@ public class Interface extends JFrame {
 		contentPane.add(scrollPane);
 		
 		JTextArea textArea = new JTextArea();
+		textArea.setFont(new Font("Courier New", Font.PLAIN, 12));
 		scrollPane.setViewportView(textArea);
 		
 		// Text field listener.
@@ -96,8 +97,7 @@ public class Interface extends JFrame {
 							} else {
 								isTop5 = "Non";
 							}
-							//textAreaContent += String.format("%-60s %-60s %s\n", state.getValue(),isTop5,state.getNUsages());
-							textAreaContent += state.getValue() + "\t\t" + isTop5 + "\t\t" + state.getNUsages() + "\n";
+							textAreaContent += String.format("%-23s %-23s %s\n", state.getValue(),isTop5,state.getNUsages());
 						}
 						textArea.setText(textAreaContent);
 					} else {
