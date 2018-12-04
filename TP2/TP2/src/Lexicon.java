@@ -1,5 +1,3 @@
-import com.sun.tools.javac.Main;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,14 +15,22 @@ public class Lexicon  {
 	private Queue<State> top5;
 
 	public Lexicon() {
-	    top5 = new LinkedList<>() {
+	    top5 = new LinkedList<State>() {
             public boolean add(State state) {
                 boolean result;
                 if(this.size() < 5)
                     result = super.add(state);
-                else
-                {
-                    super.removeFirst();
+                else {
+                	if (super.contains(state)) {
+                		// If the word we choose is already in the top 5, we
+                		// just want to push it in the back of the list.
+                		int duplicateIndex = super.indexOf(state);
+                		super.remove(duplicateIndex);
+                	}
+                	else {
+                		super.getFirst().setIsTop5(false);
+	                    super.removeFirst();
+                	}
                     result = super.add(state);
                 }
                 return result;
@@ -62,7 +68,6 @@ public class Lexicon  {
         return lexicon;
     }
 
-	// TODO nom à élaborer
 	/**
 	 * Modifies the currentState and returns all the terminal states from it
 	 * @param transition : transition from the current state to the new state
@@ -78,8 +83,9 @@ public class Lexicon  {
 
 	public boolean chooseCurrentState() {
 	    if (currentState.isTerminal()) {
-            currentState.choose();
             top5.add(currentState);
+	    	currentState.choose();
+            currentState = startState;
             return true;
         }
         return false;
@@ -93,7 +99,8 @@ public class Lexicon  {
     public State getCurrentState() {
 	    return currentState;
     }
-
-
-	
+    
+    public void reset() {
+    	currentState = startState;
+    }
 }
