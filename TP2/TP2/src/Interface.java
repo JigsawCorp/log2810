@@ -22,6 +22,7 @@ public class Interface extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField textField;
+	// Path the lexiques
 	private static final String DEFAULT_PATH = "/lexiques/";
 
 	/**

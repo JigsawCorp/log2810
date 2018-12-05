@@ -34,18 +34,23 @@ public class State {
 		if (remainingChars.size() == 0) {
 			System.out.println("test");
 		}
+		// Get the next character
 		char transition = remainingChars.poll();
 
+		// If there is not transition to this character
 		if (!nextStates.containsKey(transition)) {
+			// If this character is the last one of the word
 			if (remainingChars.isEmpty()) {
+				// Then this state is a state that holds a complete word
 				nextStates.put(transition, new State(value + transition, true));
 				return;
 			}
 			else {
+				// Otherwise this state is not a state that holds a complete word
 				nextStates.put(transition, new State(value + transition, false));
 			}
 		}
-
+		// Call the method with the following characters of the word to the next state
 		nextStates.get(transition).addStatesFrom(remainingChars);
 	}
 

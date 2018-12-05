@@ -11,12 +11,14 @@ import java.util.Queue;
  * 						method has been overloaded to have a capacity of 5 and handle duplicates.
  */
 public class Lexicon  {
-
+    // The current state which consists of the string the user has entered so far
 	private State currentState ;
+	// The start state which consists in an empty string
 	private State startState;
+	// A queue that holds the 5 most recently used states
 	private Queue<State> top5;
-
 	public Lexicon() {
+	    // Override some methods to have a size of 5
 	    top5 = new LinkedList<State>() {
             public boolean add(State state) {
                 boolean result;
@@ -38,13 +40,21 @@ public class Lexicon  {
             }
         };
 
+	    // Set the current state the the start state
 	    currentState = new State("", false);
 	    startState = currentState;
     }
 
+    /**
+     * Used to create a new lexicon
+     * @param path Path to the lexicon
+     * @return A new lexicon
+     */
 	public static Lexicon newLexicon(String path) {
         Lexicon lexicon = new Lexicon();
+        // Get our relative path
         String filePath = new File("").getAbsolutePath();
+        // Open the file
         File file = new File(filePath + path);
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -75,10 +85,14 @@ public class Lexicon  {
 	 * @return the list of states from the current state
 	 */
 	public List<State> nextState(char transition) {
+	    // If we have a transition with the character
 	    if (currentState.hasState(transition)) {
+	        // Set the current state to the state matching the character transition
 	        currentState= currentState.getState(transition);
+	        // Return all the states that are complete words
 	        return currentState.getAllTerminalStates();
         }
+        // Return null to let the client know no transition exists
 	    return null;
 	}
 
@@ -87,9 +101,13 @@ public class Lexicon  {
 	 * @return true if terminal state has been chosen, false otherwise
 	 */
 	public boolean chooseCurrentState() {
+	    // If the current state is a complete word
 	    if (currentState.isTerminal()) {
+	        // Add this word to the top 5 most recently used words
             top5.add(currentState);
+            // Select the current state
 	    	currentState.choose();
+	    	// Set the current state as the empty string
             currentState = startState;
             return true;
         }
